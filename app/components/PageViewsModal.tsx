@@ -5,12 +5,6 @@ import {
   Checkbox,
   Divider,
   InlineStack,
-  BlockStack,
-  // Button,
-  // Popover,
-  // ActionList,
-  Select,
-  Icon,
 } from "@shopify/polaris";
 
 import { useCallback, useEffect, useState } from "react";
@@ -23,69 +17,22 @@ import {
   CartesianGrid,
   ResponsiveContainer,
 } from "recharts";
-
-import { CalendarIcon } from "@shopify/polaris-icons";
-
-type Stats = {
-  views: number;
-  change: number;
-};
-
-type Props = {
-  stats: {
-    index: Stats;
-    product: Stats;
-    cart: Stats;
-  };
-  chartData: Array<{
-    date: string;
-    index: number;
-    product: number;
-    cart: number;
-  }>;
-  modalOpen: boolean;
-  update: (open: boolean) => void;
-};
-
-const colorBackgroundMap = {
-  index: "bg-fill-success",
-  product: "bg-fill-caution",
-  cart: "bg-fill-info-active",
-} as const;
+import type { PageViewModalProps } from "app/libs/types/modal";
+import { chartColors, colorBackgroundMap, maxValue, mobileWidth, pageTypes } from "app/libs/constant";
+import {
+  reChartPageViewFormatYAxisTick,
+  reChartPageViewTicks,
+} from "app/libs/pageViewFunction/model";
+import { StatBox } from "./StatBox";
+import CustomTooltip from "./CustomToolTip";
+import { TimeLineSelector1 } from "./TimeLineSelector";
 
 export default function PageViewsModal({
   stats,
   chartData,
   modalOpen,
-  update,
-}: Props) {
-  const maxValue = 10000;
-  const chartColors = {
-    index: "#29845a", // green
-    product: "#ffb800", // yellow
-    cart: "#0094d5", // blue
-  };
-  const pageTypes = [
-    { label: "Index page", key: "index", colorName: "success" },
-    { label: "Product pages", key: "product", colorName: "caution" },
-    { label: "Cart pages", key: "cart", colorName: "info-active" },
-  ];
-
-  // Calculate max value from chart data
-  // const maxValue =
-  //   Math.ceil(
-  //     Math.max(...chartData.flatMap((d) => [d.index, d.product, d.cart])) /
-  //       2000,
-  //   ) * 2000;
-
-  // Generate ticks from 0 to maxValue in 2000 increments
-  const ticks = Array.from({ length: maxValue / 2000 + 1 }, (_, i) => i * 2000);
-
-  // Format function for YAxis ticks
-  const formatYAxisTick = (value: number) => {
-    return `${value / 1000}K`;
-  };
-
+  handleModal,
+}: PageViewModalProps) {
   const [checkedItems, setCheckedItems] = useState({
     index: true,
     product: true,
@@ -96,25 +43,27 @@ export default function PageViewsModal({
   >(null);
 
   const [isMobile, setIsMobile] = useState(
-    typeof window !== "undefined" && window.innerWidth <= 490,
+    typeof window !== "undefined" && window.innerWidth <= mobileWidth,
   );
-
 
   const handleChange = useCallback((key: keyof typeof checkedItems) => {
     setCheckedItems((prev) => ({ ...prev, [key]: !prev[key] }));
   }, []);
 
-
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth <= 490);
+      setIsMobile(window.innerWidth <= mobileWidth);
     };
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   return (
-    <Modal open={modalOpen} onShow={() => update(true)} onHide={() => update(false)}>
+    <Modal
+      open={modalOpen}
+      onShow={() => handleModal(true)}
+      onHide={() => handleModal(false)}
+    >
       <TitleBar title="Page views" />
       <div
         style={{
@@ -128,14 +77,14 @@ export default function PageViewsModal({
           <Text variant="headingMd" as="h3">
             Page views statistics
           </Text>
-          <MonthSelector />
+          <TimeLineSelector1 />
         </InlineStack>
 
         {/* Stats Boxes */}
         {isMobile ? (
           <InlineStack gap="400" wrap>
             {pageTypes.map(({ label, key }) =>
-              renderStatBox({
+              StatBox({
                 label,
                 data: stats[key as keyof typeof stats],
                 key,
@@ -151,7 +100,7 @@ export default function PageViewsModal({
             }}
           >
             {pageTypes.map(({ label, key }) =>
-              renderStatBox({
+              StatBox({
                 label,
                 data: stats[key as keyof typeof stats],
                 key,
@@ -220,12 +169,13 @@ export default function PageViewsModal({
                 dataKey="date"
                 allowDataOverflow
                 tickLine={false}
+                interval="equidistantPreserveStart"
                 axisLine={{ stroke: "#ccc" }}
                 padding={{ left: 20, right: 20 }}
               />
               <YAxis
-                tickFormatter={formatYAxisTick}
-                ticks={ticks}
+                tickFormatter={reChartPageViewFormatYAxisTick}
+                ticks={reChartPageViewTicks}
                 tickLine={false}
                 domain={[0, maxValue]}
                 axisLine={{ stroke: "#ccc" }}
@@ -270,215 +220,3 @@ export default function PageViewsModal({
     </Modal>
   );
 }
-
-// Popover not working in modal
-// function MonthSelector() {
-//   const [popoverActive, setPopoverActive] = useState(false);
-//   const [selectedMonth, setSelectedMonth] = useState("Month");
-
-//   const togglePopoverActive = useCallback(
-//     () => setPopoverActive((active) => !active),
-//     [],
-//   );
-
-//   const handleMonthSelect = useCallback((month: string) => {
-//     setSelectedMonth(month);
-//     setPopoverActive(false);
-//   }, []);
-
-//   const months = [
-//     "January",
-//     "February",
-//     "March",
-//     "April",
-//     "May",
-//     "June",
-//     "July",
-//     "August",
-//     "September",
-//     "October",
-//     "November",
-//     "December",
-//   ];
-
-//   return (
-//     <Popover
-//       active={popoverActive}
-//       zIndexOverride={5100}
-//       activator={
-//         <Button
-//           onClick={togglePopoverActive}
-//           icon={CalendarIcon}
-//           disclosure
-//           size="slim"
-//         >
-//           {selectedMonth}
-//         </Button>
-//       }
-//       onClose={togglePopoverActive}
-//       preferredPosition="below"
-//       preferredAlignment="right"
-//     >
-//       <ActionList
-//         items={months.map((month) => ({
-//           content: month,
-//           onAction: () => handleMonthSelect(month),
-//         }))}
-//       />
-//     </Popover>
-//   );
-// }
-
-function MonthSelector() {
-  const [selectedMonth, setSelectedMonth] = useState("month");
-
-  const months = [
-    { label: "Day", value: "day" },
-    { label: "Month", value: "month" },
-    { label: "Week", value: "week" },
-    { label: "Year", value: "year" },
-  ];
-
-  const handleSelectChange = useCallback((value: string) => {
-    setSelectedMonth(value);
-  }, []);
-
-  return (
-    <Select
-      label={<Icon source={CalendarIcon} />}
-      labelInline
-      options={months}
-      onChange={handleSelectChange}
-      value={selectedMonth}
-    ></Select>
-  );
-}
-
-function CustomTooltip({ hoveredLine, active, payload, label }: any) {
-  if (!active || !payload || !payload.length) return null;
-  const current = payload.find((p: any) => p.dataKey === hoveredLine);
-  if (!current) return null;
-  // console.log("CustomTooltip payload:", payload, "label:", label);
-
-  const pageType = current.name; // e.g., 'Index page'
-  const views = current.value; // e.g., 25
-  const date = label; // e.g., '04/20'
-
-  return (
-    <div
-      style={{
-        background: "white",
-        border: "1px solid #E0E0E0",
-        borderRadius: "6px",
-        boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.08)",
-        padding: "8px 12px",
-        fontSize: "13px",
-        lineHeight: "16px",
-        pointerEvents: "none",
-        position: "relative",
-      }}
-    >
-      {/* Pointer triangle */}
-      <div
-        style={{
-          position: "absolute",
-          bottom: -6,
-          left: "50%",
-          transform: "translateX(-50%)",
-          width: 0,
-          height: 0,
-          borderLeft: "6px solid transparent",
-          borderRight: "6px solid transparent",
-          borderTop: "6px solid white",
-        }}
-      />
-
-      <BlockStack gap="300">
-        <Text as="h3" variant="bodySm" fontWeight="bold">
-          {pageType}
-        </Text>
-        <InlineStack gap="400" align="space-between">
-          <Text as="span" variant="bodySm">
-            Views
-          </Text>
-          <Text as="span" variant="bodySm">
-            {views}
-          </Text>
-        </InlineStack>
-        <InlineStack gap="400" align="space-between">
-          <Text as="span" variant="bodySm">
-            Date
-          </Text>
-          <Text as="span" variant="bodySm">
-            {date}
-          </Text>
-        </InlineStack>
-      </BlockStack>
-    </div>
-  );
-}
-
-const renderStatBox = ({
-  label,
-  data,
-  key,
-}: {
-  label: string;
-  data: Stats;
-  key: string;
-}) => {
-  const [firstLine, secondLine] = label.split(" ");
-  return (
-    <div
-      key={label}
-      style={{
-        display: "flex",
-        borderRadius: "6px",
-        padding: "16px",
-        background: "#f6f6f7",
-        boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
-        width: "100%",
-        justifyContent: "space-between",
-        color: "#000",
-      }}
-    >
-      <BlockStack gap="100">
-        <Text as="h2" variant="bodyLg">
-          {firstLine}
-        </Text>
-        <Text as="h2" variant="bodyLg">
-          {secondLine}
-        </Text>
-      </BlockStack>
-      <BlockStack gap="100">
-        <Text
-          as="h3"
-          variant="headingMd"
-          fontWeight="bold"
-          tone={
-            data.views > 0
-              ? "success"
-              : data.views === 0
-                ? "subdued"
-                : "critical"
-          }
-        >
-          {data.views > 0 ? `+${data.views}` : data.views}
-        </Text>
-        <Text
-          as="h4"
-          variant="bodySm"
-          tone={
-            data.change > 0
-              ? "success"
-              : data.change === 0
-                ? "subdued"
-                : "critical"
-          }
-        >
-          {data.change > 0 ? `+${data.change}%` : `${data.change}%`}
-        </Text>
-      </BlockStack>
-    </div>
-  );
-};
