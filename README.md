@@ -1,12 +1,30 @@
-# Shopify App Template - Remix
+# Dashboard Analytics (Polaris + Recharts)
 
-This is a template for building a [Shopify app](https://shopify.dev/docs/apps/getting-started) using the [Remix](https://remix.run) framework.
+This project is a responsive dashboard that uses **Shopify Polaris** for UI components and **Recharts** for data visualizations. It is optimized for mobile and desktop displays, including touch-friendly charts and interactive elements.
 
-Rather than cloning this repo, you can use your preferred package manager and the Shopify CLI with [these steps](https://shopify.dev/docs/apps/getting-started/create).
+## 🧩 Features
 
-Visit the [`shopify.dev` documentation](https://shopify.dev/docs/api/shopify-app-remix) for more details on the Remix app package.
+- ✅ Responsive layout with Polaris components
+- 📊 Line and bar charts using Recharts
+- 📱 Mobile support with dynamic x-axis label handling
+- 🎯 Clickable buttons with Polaris that work across devices
+- 🧠 Custom data formatting and chart optimizations
 
-## Quick start
+## 🔧 Tech Stack
+
+- React
+- Shopify Polaris
+- Recharts
+- TypeScript
+- CSS/SCSS
+
+## 🚀 Quick Start
+
+1. Clone the repository:
+```bash
+git clone https://github.com/jchandan001/shopify-modal-popover-chart.git
+cd shopify-modal-popover-chart
+```
 
 ### Prerequisites
 
@@ -61,42 +79,6 @@ pnpm run dev
 Press P to open the URL to your app. Once you click install, you can start development.
 
 Local development is powered by [the Shopify CLI](https://shopify.dev/docs/apps/tools/cli). It logs into your partners account, connects to an app, provides environment variables, updates remote config, creates a tunnel and provides commands to generate extensions.
-
-### Authenticating and querying data
-
-To authenticate and query data you can use the `shopify` const that is exported from `/app/shopify.server.js`:
-
-```js
-export async function loader({ request }) {
-  const { admin } = await shopify.authenticate.admin(request);
-
-  const response = await admin.graphql(`
-    {
-      products(first: 25) {
-        nodes {
-          title
-          description
-        }
-      }
-    }`);
-
-  const {
-    data: {
-      products: { nodes },
-    },
-  } = await response.json();
-
-  return nodes;
-}
-```
-
-This template comes preconfigured with examples of:
-
-1. Setting up your Shopify app in [/app/shopify.server.ts](https://github.com/Shopify/shopify-app-template-remix/blob/main/app/shopify.server.ts)
-2. Querying data using Graphql. Please see: [/app/routes/app.\_index.tsx](https://github.com/Shopify/shopify-app-template-remix/blob/main/app/routes/app._index.tsx).
-3. Responding to webhooks in individual files such as [/app/routes/webhooks.app.uninstalled.tsx](https://github.com/Shopify/shopify-app-template-remix/blob/main/app/routes/webhooks.app.uninstalled.tsx) and [/app/routes/webhooks.app.scopes_update.tsx](https://github.com/Shopify/shopify-app-template-remix/blob/main/app/routes/webhooks.app.scopes_update.tsx)
-
-Please read the [documentation for @shopify/shopify-app-remix](https://www.npmjs.com/package/@shopify/shopify-app-remix#authenticating-admin-requests) to understand what other API's are available.
 
 ## Deployment
 
