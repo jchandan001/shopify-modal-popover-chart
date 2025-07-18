@@ -9,6 +9,7 @@ import {
   Icon,
   BlockStack,
   Banner,
+  Box,
 } from "@shopify/polaris";
 import {
   ProductIcon,
@@ -116,18 +117,21 @@ export default function Index() {
               <Text as="h1" variant="heading2xl">
                 Simplify Your Store Management
               </Text>
-              <Text as="p" variant="bodyLg" alignment="center" tone="subdued">
+              <Text as="p" variant="bodyLg"  tone="subdued">
                 An intuitive dashboard to track sales, manage products, and
                 understand your customers.
               </Text>
-              <BlockStack>
-                <Button variant="primary"
-                  onClick={() => {
-                    setOpen(true);
-                  }}
-                >
-                  Show Page View
-                </Button>
+              <BlockStack align="center">
+                <Box>
+                  <Button
+                    variant="primary"
+                    onClick={() => {
+                      setOpen(true);
+                    }}
+                  >
+                    Show Page View
+                  </Button>
+                </Box>
                 <PageViewsModal
                   modalOpen={open}
                   update={setOpen}
