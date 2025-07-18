@@ -2,7 +2,7 @@
 
 This project is a responsive dashboard that uses **Shopify Polaris** for UI components and **Recharts** for data visualizations. It is optimized for mobile and desktop displays, including touch-friendly charts and interactive elements.
 
-![Dashboard Preview](modal-preview.png)
+![Dashboard Preview](/public/modal-preview.png) 
 
 ## 🧩 Features
 
