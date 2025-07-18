@@ -249,7 +249,7 @@ export default function PageViewsModal({
                   checkedItems[key as keyof typeof checkedItems] && (
                     <Line
                       key={key}
-                      type="monotone"
+                      type={hoveredLine === key ? "linear" : "monotone"}
                       dataKey={key}
                       stroke={chartColors[key as keyof typeof chartColors]}
                       name={label}
