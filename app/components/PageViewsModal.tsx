@@ -114,7 +114,7 @@ export default function PageViewsModal({
   }, []);
 
   return (
-    <Modal open={modalOpen} onHide={() => update(false)}>
+    <Modal open={modalOpen} onShow={() => update(true)} onHide={() => update(false)}>
       <TitleBar title="Page views" />
       <div
         style={{
